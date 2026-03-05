@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+::selection { background: rgba(99,102,241,.35); }
+
+.glow {
+  background:
+    radial-gradient(600px circle at var(--x, 50%) var(--y, 30%),
+      rgba(99,102,241,.25),
+      transparent 45%),
+    radial-gradient(800px circle at 20% 80%,
+      rgba(16,185,129,.15),
+      transparent 45%);
+}
+
+.glass-card {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+.glass-modal {
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(24,24,27,.55); /* zinc-ish glass */
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 30px 120px rgba(0,0,0,.55);
+}
+
+.glass-modal {
+  perspective: 1200px;
+}
+
+.glow {
+  min-height: 100vh;
+  background-image: url("public/media/images/1402305.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Optional overlay for readability */
+.glow::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: -1;
+}
