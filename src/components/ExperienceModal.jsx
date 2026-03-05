@@ -193,7 +193,7 @@ export default function ExperienceModal({ open, onClose, experiences }) {
               <div>
                 <h3 className="text-lg font-semibold">Work experience roadmap</h3>
                 <p className="mt-1 text-sm text-zinc-200/80">
-                  Look at all my experiences, no matter what you throw at me; I will always get that done!
+                  These are all the organisations I have ever worked with. No matter what you throw at me; I will always come out on top!
                 </p>
               </div>
 
