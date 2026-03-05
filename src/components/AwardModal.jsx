@@ -58,10 +58,11 @@ export default function AwardModal({ award, onClose }) {
 
               <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20 flex-1 min-h-[60vh]">
                 <iframe
-                  src={award.pdf}
-                  title={award.title}
-                  className="h-full w-full"
-                />
+  src={`${award.pdf}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+  title={award.title}
+  className="h-full w-full"
+/>
+
               </div>
             </div>
           </motion.div>
