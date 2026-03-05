@@ -7,20 +7,11 @@ import ProjectModal from "./components/ProjectModal.jsx";
 import Footer from "./components/Footer.jsx";
 import { projects } from "./content/portfolio.js";
 
-const bgUrl = `${import.meta.env.BASE_URL}media/images/1402305.png`;
-return (
-  <div
-    ref={ref}
-    className="min-h-screen glow"
-    style={{ backgroundImage: `url(${bgUrl})` }}
-  >
-    ...
-  </div>
-);
 
 export default function App() {
   const ref = useRef(null);
   const [active, setActive] = useState(null);
+  const bgUrl = `${import.meta.env.BASE_URL}media/images/1402305.png`;
 
   useEffect(() => {
     const el = ref.current;
@@ -40,6 +31,7 @@ export default function App() {
 
   
   return (
+  <div ref={ref} className="min-h-screen glow" style={{ backgroundImage: `url(${bgUrl})` }} >
     <div ref={ref} className="min-h-screen glow">
       <Navbar />
       <main className="mx-auto max-w-6xl px-5 pb-16">
@@ -69,5 +61,6 @@ export default function App() {
       <Footer />
       <ProjectModal project={active} onClose={() => setActive(null)} />
     </div>
+  </div>
   );
 }
