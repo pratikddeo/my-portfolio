@@ -105,9 +105,16 @@ function Roadmap({ experiences }) {
 
       {experiences.map((e, i) => {
         const p = points[i] || { x: 260, y: 80 + i * 210 };
-        const leftSide = i % 2 === 0;
+        const centerX = W / 2;
 
-        const dir = leftSide ? -1 : 1;
+// Base side from the point position (keeps cards on the “outer” side)
+const baseLeft = (p.x ?? centerX) < centerX;
+
+// Enforce alternation: even indexes follow base, odd indexes flip
+const leftSide = i % 2 === 0 ? baseLeft : !baseLeft;
+
+const dir = leftSide ? -1 : 1;
+
 
         // Pull cards closer to dots + make width responsive
         const GAP = 10;
