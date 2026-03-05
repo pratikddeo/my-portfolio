@@ -17,7 +17,7 @@ function LogoCarousel({ experiences }) {
                 <img
                   src={e.logo}
                   alt={e.company}
-                  className="h-full w-full object-contain p-2"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div className="text-sm text-zinc-100/90">{e.company}</div>
@@ -30,23 +30,21 @@ function LogoCarousel({ experiences }) {
 }
 
 function Roadmap({ experiences }) {
-  // Wide canvas; modal wrapper provides horizontal scroll if needed
   const W = 1400;
   const xLine = Math.round(W / 2);
 
-  // Layout constants (tweak freely)
   const TOP = 70;
   const BOTTOM = 90;
-  const MIN_ROW = 170; // minimum vertical spacing per item
-  const ROW_GAP = 44; // extra gap between items
-  const SIDE_PAD = 120; // distance from edge to card
-  const CARD_W = 520; // fixed width like your example (more stable than clamp)
+  const MIN_ROW = 170;
+  const ROW_GAP = 44;
+  const SIDE_PAD = 110;
 
-  // Measure cards to avoid overlap
+  // responsive card width (dynamic)
+  const CARD_W = "clamp(320px, 38vw, 560px)";
+
   const cardRefs = useRef([]);
   const [heights, setHeights] = useState([]);
 
-  // Reset refs length when experiences change
   useEffect(() => {
     cardRefs.current = cardRefs.current.slice(0, experiences.length);
   }, [experiences.length]);
@@ -58,13 +56,10 @@ function Roadmap({ experiences }) {
     };
 
     measure();
-
-    // Re-measure on resize (responsive fonts / wrapping)
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [experiences.length]);
 
-  // Compute y positions based on measured heights
   const ys = useMemo(() => {
     const out = [];
     let y = TOP;
@@ -79,35 +74,82 @@ function Roadmap({ experiences }) {
   }, [experiences.length, heights]);
 
   const H = useMemo(() => {
-    if (!ys.length) return Math.max(760, TOP + BOTTOM + experiences.length * (MIN_ROW + ROW_GAP));
+    if (!ys.length) {
+      return Math.max(
+        760,
+        TOP + BOTTOM + experiences.length * (MIN_ROW + ROW_GAP)
+      );
+    }
     const lastCenter = ys[ys.length - 1];
     const lastH = Math.max(MIN_ROW, heights[heights.length - 1] || MIN_ROW);
     return Math.max(760, lastCenter + lastH / 2 + BOTTOM);
   }, [ys, heights, experiences.length]);
 
-  const xLeft = SIDE_PAD + CARD_W / 2;
-  const xRight = W - SIDE_PAD - CARD_W / 2;
+  // We can’t do math on clamp() directly, so place cards using translate + fixed anchors.
+  // Anchor left cards to SIDE_PAD, right cards to (W - SIDE_PAD).
+  const xLeftAnchor = SIDE_PAD;
+  const xRightAnchor = W - SIDE_PAD;
 
   return (
     <div className="relative mx-auto" style={{ width: W, height: H }}>
-      {/* Center vertical line */}
-      <svg className="absolute inset-0" width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+      {/* Center line layer (separate, so it stays visible) */}
+      <svg
+        className="absolute inset-0"
+        width={W}
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ pointerEvents: "none" }}
+      >
         <defs>
-          <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255,255,255,.30)" />
-            <stop offset="100%" stopColor="rgba(255,255,255,.10)" />
+          {/* Gold gradient */}
+          <linearGradient id="goldLine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255, 215, 110, .95)" />
+            <stop offset="45%" stopColor="rgba(255, 196, 72, .90)" />
+            <stop offset="100%" stopColor="rgba(180, 120, 20, .75)" />
           </linearGradient>
+
+          {/* Glow */}
+          <filter id="goldGlow" x="-80%" y="-20%" width="260%" height="140%">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
+            <feColorMatrix
+              in="blur"
+              type="matrix"
+              values="
+                1 0 0 0 0.95
+                0 1 0 0 0.72
+                0 0 1 0 0.20
+                0 0 0 0.9 0"
+              result="goldBlur"
+            />
+            <feMerge>
+              <feMergeNode in="goldBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
+        {/* soft glow stroke behind */}
         <line
           x1={xLine}
           y1={TOP}
           x2={xLine}
           y2={H - BOTTOM}
-          stroke="url(#road)"
-          strokeWidth="6"
+          stroke="rgba(255, 205, 90, .35)"
+          strokeWidth="10"
           strokeLinecap="round"
           opacity="0.55"
+          filter="url(#goldGlow)"
+        />
+        {/* main shiny line */}
+        <line
+          x1={xLine}
+          y1={TOP}
+          x2={xLine}
+          y2={H - BOTTOM}
+          stroke="url(#goldLine)"
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          opacity="0.95"
         />
       </svg>
 
@@ -115,14 +157,10 @@ function Roadmap({ experiences }) {
         const y = ys[i] ?? TOP + i * (MIN_ROW + ROW_GAP);
         const leftSide = i % 2 === 0;
 
-        // Put cards far from the center line (like your example)
-        const cardX = leftSide ? xLeft : xRight;
-
-        // Connector dot is on the center line
         const dotX = xLine;
 
-        // Horizontal connector length from dot to near the card
-        const connectorEndX = leftSide ? cardX + CARD_W / 2 + 18 : cardX - CARD_W / 2 - 18;
+        // Connector goes from dot towards the card, but card can be far (like your example)
+        const connectorEndX = leftSide ? dotX - 140 : dotX + 140;
 
         return (
           <motion.div
@@ -144,18 +182,19 @@ function Roadmap({ experiences }) {
               <circle
                 cx={dotX}
                 cy={y}
-                r="6"
-                fill="rgba(255,255,255,.25)"
-                stroke="rgba(255,255,255,.35)"
-                strokeWidth="1.5"
+                r="7"
+                fill="rgba(255, 210, 95, .25)"
+                stroke="rgba(255, 215, 120, .80)"
+                strokeWidth="1.6"
+                filter="url(#goldGlow)"
               />
               <line
                 x1={dotX}
                 y1={y}
                 x2={connectorEndX}
                 y2={y}
-                stroke="rgba(255,255,255,.22)"
-                strokeWidth="1.5"
+                stroke="rgba(255, 210, 120, .35)"
+                strokeWidth="1.6"
               />
             </svg>
 
@@ -165,22 +204,31 @@ function Roadmap({ experiences }) {
               className="glass-card rounded-3xl p-5 absolute"
               style={{
                 width: CARD_W,
-                left: cardX,
                 top: y,
-                transform: "translate(-50%, -50%)",
+                left: leftSide ? xLeftAnchor : xRightAnchor,
+                transform: leftSide
+                  ? "translate(0%, -50%)"
+                  : "translate(-100%, -50%)",
               }}
             >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+              <div className="flex items-center gap-4">
+                {/* Bigger logo box, no padding so logo can be fully seen */}
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                   <img
                     src={e.logo}
                     alt={e.company}
-                    className="h-full w-full object-contain p-2"
+                    className="h-full w-full object-contain"
+                    draggable={false}
                   />
                 </div>
+
                 <div className="min-w-0">
-                  <p className="text-base font-semibold leading-tight">{e.role}</p>
-                  <p className="text-sm text-zinc-300/80 truncate">{e.company}</p>
+                  <p className="text-base font-semibold leading-tight">
+                    {e.role}
+                  </p>
+                  <p className="text-sm text-zinc-300/80 truncate">
+                    {e.company}
+                  </p>
                 </div>
               </div>
 
@@ -229,7 +277,12 @@ export default function ExperienceModal({ open, onClose, experiences }) {
             initial={{ y: 18, scale: 0.985, opacity: 0 }}
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: 18, scale: 0.985, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.9 }}
+            transition={{
+              type: "spring",
+              stiffness: 420,
+              damping: 36,
+              mass: 0.9,
+            }}
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4 sm:p-5 overflow-hidden rounded-t-3xl">
@@ -252,7 +305,10 @@ export default function ExperienceModal({ open, onClose, experiences }) {
             <div className="p-4 sm:p-5 grid gap-5">
               <LogoCarousel experiences={experiences} />
 
-              <div className="overflow-y-auto overflow-x-auto" style={{ maxHeight: "84vh" }}>
+              <div
+                className="overflow-y-auto overflow-x-auto"
+                style={{ maxHeight: "84vh" }}
+              >
                 <div className="min-w-max px-6">
                   <Roadmap experiences={experiences} />
                 </div>
