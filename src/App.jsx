@@ -124,7 +124,7 @@ export default function App() {
     ].map((item) => (
       <div
         key={item.label}
-        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/10 backdrop-blur px-4 py-3"
       >
         <div className="text-sm">
           <span className="text-zinc-400">{item.label}:</span>{" "}
