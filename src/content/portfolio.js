@@ -60,7 +60,7 @@ export const whoAmI = [
     title: "Anime",
     image: `${base}media/images/itachi.webp`,
     content:
-      "I derive the rest of personality from him. Itachi Uchiha. From the anime: Naruto. Anime to me is something very influencial. Trust me when I say this, some of the greates and best people of today's generation draw their motivations from some anime character. This style of visual entertainment has let artists express all the kinds of emotions to the fullest, something you cannot achieve in movies or though disney style animations. My favourites? Naruto, Anohana, jjk,Berserk, Kimi no nawa, Haikyu (List goes on again)"
+      "I derive the rest of personality from him. Itachi Uchiha. From the anime: Naruto. Anime to me is something very influencial. Trust me when I say this, some of the greatest and best people of today's generation draw their motivations from some anime character. This style of visual entertainment has let artists express all the kinds of emotions to the fullest, something you cannot achieve in movies or though disney style animations. My favourites? Naruto, Anohana, jjk,Berserk, Kimi no nawa, Haikyu (List goes on again)"
   }
 ];
 
