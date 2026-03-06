@@ -45,12 +45,12 @@ function ParticleCanvas() {
         alpha: random(0.2, 0.9),
         drift: random(0.2, 1.1),
         phase: random(0, Math.PI * 2),
-        warm: Math.random() > 0.15,
+        warm: Math.random() > 0.5,
       };
     };
 
     const drawParticle = (p, t) => {
-      const waveY = Math.sin(t * 0.0018 + p.phase + p.x * 0.003) * (10 + p.drift * 14);
+      const waveY = Math.sin(t * 0.5 + p.phase + p.x * 0.003) * (10 + p.drift * 14);
       const y = p.y + waveY;
 
       const color = p.warm
