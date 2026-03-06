@@ -16,7 +16,7 @@ export const whoAmI = [
   {
     id: "about-1",
     title: "A strategist, analyst, manager, a wizard in human form (kinda literally) ",
-    image: `${base}media/images/moi.jpg`,
+    image: `${base}media/images/moi.jpeg`,
     content:
       "I enjoy turning messy information into clear strategic narratives. That is why I like consulting, marketing strategy, and research-heavy problem solving."
   },
