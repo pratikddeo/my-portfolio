@@ -22,12 +22,18 @@ export default function App() {
   const bgUrl = `${import.meta.env.BASE_URL}media/images/wlp1.jpg`;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setShowIntro(false);
-    }, 2600);
+  const timer = window.setTimeout(() => setShowIntro(false), 2800);
+  return () => window.clearTimeout(timer);
+}, []);
 
-    return () => window.clearTimeout(timer);
-  }, []);
+return (
+  <>
+    <IntroSplash show={showIntro} />
+    <div ref={ref} className="min-h-screen glow" style={{ backgroundImage: `url(${bgUrl})` }}>
+      {/* rest of app */}
+    </div>
+  </>
+);
 
   useEffect(() => {
     const el = ref.current;
