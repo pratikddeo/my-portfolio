@@ -1,7 +1,7 @@
 const base = import.meta.env.BASE_URL;
 
 export const profile = {
-  name: "This is me!",
+  name: "C'est Moi!",
   title: "Pratik D Deo",
   location: "Consulting / Strategy / Marketing - Portfolio",
   blurb:
