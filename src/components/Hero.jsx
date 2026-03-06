@@ -45,11 +45,12 @@ export default function Hero() {
       <img
         src={profile.schoolLogo}
         alt="Business school logo"
-        className="h-full w-full object-cover"
+        className="h-full w-full object-contain"
       />
     </div>
   </div>
 ) : null}
+
 
         </div>
       </motion.div>
