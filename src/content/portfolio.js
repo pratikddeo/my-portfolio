@@ -36,7 +36,7 @@ export const whoAmI = [
   },
   {
     id: "about-3",
-    title: "F1: Loved Mercedes before they became popular!",
+    title: "F1: Loved Mercedes even before they became popular!",
     image: `${base}media/images/merc.webp`,
     content:
       "Since childhood, I always loved Mercedes. I remember seeing a mercedes and asking my dad what car it is. He said mercedes. It took the kid me 2 days to learn the pronounciation, and it has been on my mind ever since. My favourite car brand and my favorite F1 team."
