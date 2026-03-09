@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import { trackEvent } from "../lib/analytics";
 
 function LogoCarousel({ experiences }) {
   return (
@@ -33,8 +34,10 @@ function LogoCarousel({ experiences }) {
 function ExperienceRoadmapCard({ e, logoH = 92 }) {
   return (
     <div className="glass-card rounded-3xl overflow-hidden border border-white/10">
-      {/* Big logo banner */}
-      <div className="relative border-b border-white/10 bg-white/5" style={{ height: logoH }}>
+      <div
+        className="relative border-b border-white/10 bg-white/5"
+        style={{ height: logoH }}
+      >
         <img
           src={e.logo}
           alt={e.company}
@@ -60,7 +63,7 @@ function ExperienceRoadmapCard({ e, logoH = 92 }) {
   );
 }
 
-function Roadmap({ experiences }) {
+function Roadmap({ experiences, scrollRootRef }) {
   const W = 1400;
 
   const TOP = 70;
@@ -96,6 +99,48 @@ function Roadmap({ experiences }) {
     };
   }, [experiences.length]);
 
+  useEffect(() => {
+    const rootEl = scrollRootRef?.current;
+    if (!rootEl) return;
+
+    const seen = new Set();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("data-exp-id");
+          const company = entry.target.getAttribute("data-exp-company");
+          const role = entry.target.getAttribute("data-exp-role");
+
+          if (entry.isIntersecting && id && !seen.has(id)) {
+            seen.add(id);
+            trackEvent("view_experience_card", {
+              experience_id: id,
+              company,
+              role,
+            });
+          }
+        });
+      },
+      {
+        root: rootEl,
+        threshold: 0.45,
+      }
+    );
+
+    cardRefs.current.forEach((el, i) => {
+      const exp = experiences[i];
+      if (!el || !exp) return;
+
+      el.setAttribute("data-exp-id", exp.id);
+      el.setAttribute("data-exp-company", exp.company);
+      el.setAttribute("data-exp-role", exp.role);
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [experiences, heights, scrollRootRef]);
+
   const ys = useMemo(() => {
     const out = [];
     let y = TOP;
@@ -111,7 +156,10 @@ function Roadmap({ experiences }) {
 
   const H = useMemo(() => {
     if (!ys.length) {
-      return Math.max(760, TOP + BOTTOM + experiences.length * (MIN_ROW + ROW_GAP));
+      return Math.max(
+        760,
+        TOP + BOTTOM + experiences.length * (MIN_ROW + ROW_GAP)
+      );
     }
     const lastCenter = ys[ys.length - 1];
     const lastH = Math.max(MIN_ROW, heights[heights.length - 1] || MIN_ROW);
@@ -143,7 +191,9 @@ function Roadmap({ experiences }) {
                 width: CARD_W,
                 top: y,
                 left: leftSide ? xLeftAnchor : xRightAnchor,
-                transform: leftSide ? "translate(0%, -50%)" : "translate(-100%, -50%)",
+                transform: leftSide
+                  ? "translate(0%, -50%)"
+                  : "translate(-100%, -50%)",
               }}
             >
               <ExperienceRoadmapCard e={e} logoH={LOGO_H} />
@@ -156,12 +206,34 @@ function Roadmap({ experiences }) {
 }
 
 export default function ExperienceModal({ open, onClose, experiences }) {
+  const hasTrackedOpen = useRef(false);
+  const scrollRootRef = useRef(null);
+
   useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e) => e.key === "Escape" && onClose();
+    if (!open) {
+      hasTrackedOpen.current = false;
+      return;
+    }
+
+    if (!hasTrackedOpen.current) {
+      trackEvent("view_experience_modal", {
+        total_experiences: experiences?.length || 0,
+      });
+      hasTrackedOpen.current = true;
+    }
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        trackEvent("close_experience_modal", {
+          close_method: "escape",
+        });
+        onClose();
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+  }, [open, onClose, experiences]);
 
   return (
     <AnimatePresence>
@@ -171,7 +243,12 @@ export default function ExperienceModal({ open, onClose, experiences }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onMouseDown={onClose}
+          onMouseDown={() => {
+            trackEvent("close_experience_modal", {
+              close_method: "backdrop",
+            });
+            onClose();
+          }}
         >
           <motion.div
             className="absolute inset-0 bg-black/50"
@@ -198,7 +275,12 @@ export default function ExperienceModal({ open, onClose, experiences }) {
               </div>
 
               <button
-                onClick={onClose}
+                onClick={() => {
+                  trackEvent("close_experience_modal", {
+                    close_method: "button",
+                  });
+                  onClose();
+                }}
                 className="rounded-xl border border-white/10 bg-white/10 backdrop-blur px-3 py-2 hover:bg-white/15"
                 aria-label="Close"
               >
@@ -209,9 +291,16 @@ export default function ExperienceModal({ open, onClose, experiences }) {
             <div className="p-4 sm:p-5 grid gap-5 overflow-hidden flex-1 min-h-0">
               <LogoCarousel experiences={experiences} />
 
-              <div className="overflow-y-auto overflow-x-auto" style={{ maxHeight: "100%" }}>
+              <div
+                ref={scrollRootRef}
+                className="overflow-y-auto overflow-x-auto"
+                style={{ maxHeight: "100%" }}
+              >
                 <div className="min-w-max px-6">
-                  <Roadmap experiences={experiences} />
+                  <Roadmap
+                    experiences={experiences}
+                    scrollRootRef={scrollRootRef}
+                  />
                 </div>
               </div>
             </div>
