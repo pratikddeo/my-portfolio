@@ -6,7 +6,7 @@ export const profile = {
   location: "Consulting / Strategy / Marketing - Portfolio",
   blurb:
     "I build strategy + storytelling backed by research, data and creativity. Here are a few projects, decks, and videos to understand me better! Contact me if you find me or my work impressive(I know you will).",
-    schoolLogo: `${base}media/images/edhec.webp`,
+    schoolLogo: `${base}media/images/alimg.webp`,
   links: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/pratikddeo/" }
   ],

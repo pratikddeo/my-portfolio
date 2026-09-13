@@ -10,15 +10,18 @@ export default function ProjectCard({ project, onOpen }) {
       className="glass-card group w-full text-left overflow-hidden rounded-3xl"
     >
       {/* Card thumbnail area (still looks landscape in the card) */}
-<div className="h-44 w-full overflow-hidden bg-white/5 sm:h-48 rounded-3xl">
-  <img
-    src={project.thumbnail}
-    alt=""
-    className="h-full w-full object-cover"
-    loading="lazy"
-  />
+<div className="h-44 w-full bg-white/5 sm:h-48">
+  <motion.div layoutId={`thumb-${project.id}`} className="h-full w-full">
+    {project.thumbnail ? (
+      <img
+        src={project.thumbnail}
+        alt=""
+        className="h-full w-full object-cover"
+        loading="lazy"
+      />
+    ) : null}
+  </motion.div>
 </div>
-
 
 
       <div className="p-5">
